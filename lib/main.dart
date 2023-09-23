@@ -1,7 +1,13 @@
-import 'package:flutter/material.dart';
+import 'dart:developer';
 
-void main() {
-  runApp(const MyApp());
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -56,6 +62,19 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+
+  @override
+  void initState() {
+    onAsyncInitState();
+    super.initState();
+  }
+
+  Future<void> onAsyncInitState() async {
+    DatabaseReference starCountRef =
+        FirebaseDatabase.instance.ref('table_name');
+    final dataSnapshot = await starCountRef.get();
+    log(dataSnapshot.value.toString());
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -121,5 +140,10 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }
